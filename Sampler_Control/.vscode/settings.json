@@ -1,0 +1,10 @@
+{
+    "extensions.ignoreRecommendations": true,
+    "C_Cpp.default.configurationProvider": "particle.particle-vscode-core",
+    "files.associations": {
+        "*.ino": "cpp"
+    },
+    "particle.targetDevice": "water_sampling01",
+    "particle.firmwareVersion": "4.1.0",
+    "particle.targetPlatform": "boron"
+}
