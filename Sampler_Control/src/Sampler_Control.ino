@@ -1,7 +1,7 @@
 /*
  * Project Sampler_Control
  * Description:
- * Author:
+ * Author: Joseph DeMarco
  * Date:
  */
 
