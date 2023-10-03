@@ -10,7 +10,8 @@
 
 // GPIO pin
 const int sensorPin = D2; //TEMPORARY RANDOM PIN TO BE REPLACED
-
+const float voltageMin = 3.0; // Minimum operating voltage
+const float voltageMax = 24.0; // Maximum operating voltage
 
 const float freq = 21.0; // Frequency-to-flow conversion constant
 
@@ -33,7 +34,7 @@ float readWaterFlowSensor() {
 
 void setup() {
     // Initialize the Particle Boron LTE device
-    Particle.begin();
+    //Particle.begin();
 
     // Set the sensor pin as an input
     pinMode(sensorPin, INPUT);
