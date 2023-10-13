@@ -11,19 +11,17 @@
 // GPIO pin
 #define flowMeter D2//TEMPORARY RANDOM PIN TO BE REPLACED
 
-const float pulsesPerLiter = 450; //output pulses/liters
-const float freq = 21.0; // Frequency-to-flow conversion constant
-
 //Global variables
-volatile int pulseCount;
+const float pulsesPerLiter = 450; //output pulses/liters
+volatile int flowPulseCount;
 
 void flowMeter_ISR(){
-    pulseCount++;
+    flowPulseCount++;
 }
 
 // Function to read the sensor output and calculate the flow
 float calcWaterFlow() {
-    float flow = pulseCount/pulsesPerLiter;
+    float flow = flowPulseCount/pulsesPerLiter; // flow in liters
     return flow;
 }
 
