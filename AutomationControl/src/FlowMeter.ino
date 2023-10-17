@@ -15,6 +15,7 @@
 //Global variables
 const float pulsesPerLiter = 450; //output pulses/liters
 volatile int flowPulseCount;
+volatile float flow;
 extern float sampleVolume;
 
 void flowMeter_ISR(){
@@ -25,7 +26,6 @@ void flowMeter_ISR(){
 }
 
 // Function to read the sensor output and calculate the flow
-float calcWaterFlow() {
-    float flow = flowPulseCount/pulsesPerLiter; // flow in liters
-    return flow;
+void calcWaterFlow() {
+    flow = flowPulseCount/pulsesPerLiter; // flow in liters
 }
