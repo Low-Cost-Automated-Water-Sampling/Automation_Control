@@ -9,7 +9,7 @@ SYSTEM_THREAD(ENABLED);
 #define sleepTime 120        // sleep time in sec = 2 min
 #define WAKEUP_PIN D2
 #define LED0 D7
-#define led1 D0;
+#define led1 D0
 
 void setup() {
     pinMode(led1, OUTPUT);
