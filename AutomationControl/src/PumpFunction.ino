@@ -8,7 +8,9 @@
 /**
  * Joe: Need some pump power off safety mechanism in case flow is never triggered
 */
-int pump = D4;  //Sets pin D4 to the Pump
+
+#include <DataStructures.h>
+
 
 void RunPump(){
 	digitalWrite(pump, HIGH);

@@ -8,14 +8,12 @@
 
 #include <Particle.h>
 #include <PumpFunction.ino>
+#include <DataStructures.h>
 
 // GPIO pin
 #define flowMeter D2//TEMPORARY RANDOM PIN TO BE REPLACED
 
-//Global variables
-const float pulsesPerLiter = 450; //output pulses/liters
-volatile int flowPulseCount;
-volatile float flow;
+
 extern float sampleVolume;
 
 void flowMeter_ISR(){

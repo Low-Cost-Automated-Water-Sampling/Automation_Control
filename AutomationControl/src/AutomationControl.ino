@@ -8,23 +8,12 @@
  */
 
 #include <Particle.h>
-#include <FlowMeter.ino>
-#include <PumpFunction.ino>
+#include <string>
+#include <DataStructures.h>
 
-// Pins
-#define flowMeter D2//TEMPORARY RANDOM PINS TO BE REPLACED
-#define servo D1
-#define pump D4  
 
-//Global variables
-volatile extern int flowPulseCount;
-volatile extern float flow;
-//will be user defined
-float sampleVolume = 450; //500mL bottle assuming leave room to not overflow
-int numSamples = 24; //define number of samples available while empty
-int sampleCounter = 0; //increment
-float degreesPerSample = 360 / (numSamples+1); //sample bottles and flush spot split evenly
-bool samplesFull = false;
+SYSTEM_MODE(SEMI_AUTOMATIC);
+SYSTEM_THREAD(ENABLED);
 
 
 // setup() runs once, when the device is first turned on.
@@ -35,12 +24,28 @@ void setup() {
     pinMode(servo, OUTPUT);
     pinMode(flowMeter, INPUT); //will need to change to PULLUP or PULLDOWN unsure
     attachInterrupt(flowMeter, flowMeter_ISR, RISING);
+
+    pinMode(led1, OUTPUT);
+    pinMode(LED0, OUTPUT);
 }
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
     // The core of your code will likely live here.
     calcWaterFlow();
+
+    //Including Sleep control and rain meter
+    SystemSleepConfiguration config;                    // declare a sleep config object called config
+    config.mode(SystemSleepMode::ULTRA_LOW_POWER)                  // define the properties of our sleep config object
+          //.network(NETWORK_INTERFACE_CELLULAR)          // should wakeup due to network or cellular connection
+          //.flag(SystemSleepFlag::WAIT_CLOUD)
+		  .gpio(WAKEUP_PIN, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
+		  .duration(sleepTime*1000);                    // or wakeup after duration in ms (unlike classic sleep fn)
+    //    .duration(2min);                              // alternative way to specify duration in minutes		  
+    digitalWrite(LED0,LOW);                             // turn off led before going to sleep
+	SystemSleepResult result = System.sleep(config);    // go to sleep
+    digitalWrite(LED0, HIGH);                           // turn on the led when we wake up
+    delay(10000);       
 
 }
 
