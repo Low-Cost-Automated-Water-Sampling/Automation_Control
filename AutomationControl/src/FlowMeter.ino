@@ -7,7 +7,8 @@
 */
 
 #include <Particle.h>
-#include "PumpFunction.ino"
+//#include "PumpFunction.ino"
+#include "DataStructures.h"
 
 // GPIO pin
 #define flowMeter D2//TEMPORARY RANDOM PIN TO BE REPLACED

@@ -8,7 +8,8 @@
 /**
  * Joe: Need some pump power off safety mechanism in case flow is never triggered
 */
-#include "DataStructues.h"
+#include "DataStructures.h"
+
 
 void RunPump(){
 	digitalWrite(pump, HIGH);

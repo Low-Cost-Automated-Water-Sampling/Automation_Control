@@ -1,7 +1,8 @@
 /**
  * Joseph DeMarco
  * 
- * Water Sampler Data Structures and Definitions
+ * Water Sampler Data Structures and Declarations
+ * Data Structures header file
  * 10/23/2023
 */
 
@@ -38,6 +39,8 @@ volatile float rainAmount;
 // object instantiations
 class Samplebottle;
 SampleBottle Samples[24];
+//set up sample array
+
 SystemSleepConfiguration config; // declare a sleep config object called config
 
 
@@ -58,10 +61,10 @@ class Sampler {
         int sampleCounter = 0; //increment
         float degreesPerSample = 360 / (numSamples+1); //sample bottles and flush spot split evenly
         bool samplesFull = false;
-        int rainEvent; //# rain pulses?
+        float rainEvent; //# rain pulses?
 
         //constructor
-        Sampler(String site, String device, int Volume = 500, int numberOfSamples = 24, int rain = 2){
+        Sampler(String site, String device, int Volume = 500, int numberOfSamples = 24, float rain = 2){
             siteName = site;
             deviceName = device;
             sampleVolume = Volume;
@@ -98,6 +101,7 @@ class SampleBottle {
 
 };
 
+///////////////////////////////////////////////// Functions /////////////////////////////////////////////
 // function declarations
 void takeSample(String triggerType = "unknown");
 void flowMeter_ISR();
