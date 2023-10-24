@@ -7,18 +7,15 @@
 */
 
 #include <Particle.h>
-#include <PumpFunction.ino>
-#include <DataStructures.h>
+#include "PumpFunction.ino"
 
 // GPIO pin
 #define flowMeter D2//TEMPORARY RANDOM PIN TO BE REPLACED
 
 
-extern float sampleVolume;
-
 void flowMeter_ISR(){
     flowPulseCount++;
-    if(flow == sampleVolume){
+    if(flow >= (TestSampler.sampleVolume-50)){ //50 mL threshold
         pumpOff();
     }
 }

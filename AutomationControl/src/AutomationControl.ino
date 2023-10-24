@@ -9,8 +9,9 @@
 
 #include <Particle.h>
 #include <string>
-#include <DataStructures.h>
-
+#include "DataStructures.h"
+// #include "FlowMeter.ino"
+// #include "PumpFunction.ino"
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -24,22 +25,30 @@ void setup() {
     pinMode(servo, OUTPUT);
     pinMode(flowMeter, INPUT); //will need to change to PULLUP or PULLDOWN unsure
     attachInterrupt(flowMeter, flowMeter_ISR, RISING);
+    attachInterrupt(RainSensor, rainMeasure_ISR, FALLING); //Not 
 
     pinMode(led1, OUTPUT);
     pinMode(LED0, OUTPUT);
+
+    //set up sample array
+    for(int i=0; i<24; i++){
+        Samples[i] = SampleBottle(i);
+    }
+    
 }
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
     // The core of your code will likely live here.
     calcWaterFlow();
+    calculateRainfall();
 
     //Including Sleep control and rain meter
-    SystemSleepConfiguration config;                    // declare a sleep config object called config
-    config.mode(SystemSleepMode::ULTRA_LOW_POWER)                  // define the properties of our sleep config object
-          //.network(NETWORK_INTERFACE_CELLULAR)          // should wakeup due to network or cellular connection
+    
+    config.mode(SystemSleepMode::ULTRA_LOW_POWER)       // define the properties of our sleep config object
+          //.network(NETWORK_INTERFACE_CELLULAR)        // should wakeup due to network or cellular connection
           //.flag(SystemSleepFlag::WAIT_CLOUD)
-		  .gpio(WAKEUP_PIN, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
+		  .gpio(RainSensor, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
 		  .duration(sleepTime*1000);                    // or wakeup after duration in ms (unlike classic sleep fn)
     //    .duration(2min);                              // alternative way to specify duration in minutes		  
     digitalWrite(LED0,LOW);                             // turn off led before going to sleep
@@ -60,30 +69,29 @@ void loop() {
 // Default sample arm position will be flush, at the end of a sample cycle
 // On Scheduled sample time, user input, or specified rain event
 // TIMER?
-void takeSample(){ //will likely turn sample into an interrupt or something similar
+void takeSample(String triggerType = "unknown"){ //will likely turn sample into an interrupt or something similar
 // First check sample availability/count
-    if(sampleCounter < numSamples){ // Samples available:  //sampleFull will be a sample bottle attribute
-    //maybe: if(Samples[sampleCounter].sampleFull == false)
+    if(TestSampler.sampleCounter < TestSampler.numSamples && Samples[TestSampler.sampleCounter].sampleFull == false){ // Samples available and this sample number is empty, 
+        
 		flushSystem(); // Flush System //tbd 
 
         // TakeSample
         // maybe change to Samples[sampleCounter].fill or something with degree values internal
-        servoSample(sampleCounter, degreesPerSample); // Position servo to next available sample
+        // servo control to be defined - will adjust arg needs
+        servoSample(TestSampler.sampleCounter, TestSampler.degreesPerSample); // Position servo to next available sample
         RunPump();
-        // while(flow < sampleVolume){} // Power pump until sample size reached -- first idea
         // Flow meter ISR calls pumpOff if flow == sampleVolume
 
         //check water is flowing
         pumpingFails();
 
         // update necessary sample bottle statuses
-        // Samples[sampleCounter].sampleFull // Change status of sample, sample count? – Need to define DATA STRUCTURES
-        // Samples[sampleCounter].sampleTime
-        // Samples[sampleCounter].triggerType
+        Samples[TestSampler.sampleCounter].sampleFull; // Change status of sample, sample count? – Need to define DATA STRUCTURES
+        // Samples[TestSampler.sampleCounter].sampleTime //
+        Samples[TestSampler.sampleCounter].triggerType = triggerType;
         // others?
-    }
-    else{// If the sampleCounter >= numSamples, a flag is raised, and a notice is sent to the cloud along with the sample info. 
-        samplesFull = true;
+    }else {// If the sampleCounter >= numSamples, a flag is raised, and a notice is sent to the cloud along with the sample info. 
+        TestSampler.samplesFull = true;
         // No sample containers available
         // Set flag, notify user, device to sleep 
         // samplesFull = TRUE
@@ -92,7 +100,7 @@ void takeSample(){ //will likely turn sample into an interrupt or something simi
     
     // increment sampleCounter and reset 
     // Reset servo to flush position
-    sampleCounter++;
+    TestSampler.sampleCounter++;
     flow = 0;
     servoFlush();
 
@@ -105,45 +113,12 @@ void takeSample(){ //will likely turn sample into an interrupt or something simi
 
 
 
-void flushSystem() {
-	servoFlush(); // ServoFlush: Set servo motor to flush position
-    //default position should be flush, but need a way to check. perhaps when I learn more about servos
-
-	//while(flow < sampleVolume){ //Change sample volume to volume of system to be flushed
-	RunPump();
-    // flow meter ISR shuts off pump pumpOff() when flow == sampleVolume
-
-    // need to check if water is actually flowing when pump is on
-    pumpingFails();
-	
-    flow = 0; //reset flow measure
-}
 
 
-void servoFlush(){ // will be Minh
-	//set the servo to flush position
-}
-void servoSample(int sample, float degrees){
-    //move servo to sample * degrees
-}
 
 
-// Include monitoring if water is not flowing
-void pumpingFails(){
-    // if no water after 3s
-        delay(3000);
-        if(flow == 0){ //if no water, turn off pump
-            pumpOff();
-            // NEED ERROR MESSAGES
-            //include some message, maybe sample failed
-        }
-        //if sample insufficient water in 40s, fail, pump off
-        delay(40000);
-        if(flow<(1/2*sampleVolume)){
-            pumpOff();
-            // NEED ERROR MESSAGE
-        }
-}
+
+
 
 
 
