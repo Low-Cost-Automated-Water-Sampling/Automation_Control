@@ -6,13 +6,12 @@
  * Flow Meter Reading
 */
 
-#include <Particle.h>
+//#include <Particle.h>
 //#include "PumpFunction.ino"
 #include "DataStructures.h"
 
 // GPIO pin
 #define flowMeter D2//TEMPORARY RANDOM PIN TO BE REPLACED
-
 
 void flowMeter_ISR(){
     flowPulseCount++;

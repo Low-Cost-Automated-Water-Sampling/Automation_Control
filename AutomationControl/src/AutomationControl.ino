@@ -29,8 +29,9 @@ void setup() {
     pinMode(led1, OUTPUT); //LEDs to show sleeping or awake
     pinMode(LED0, OUTPUT);
 
+    //bottle array instantiation
     for(int i=0; i<24; i++){
-        Samples[i] = SampleBottle(i);
+        Samples[i] = SampleBottle(i+1); // ID = 0->23 +1-> 1->24
     }
 
     //Sleep configuration
@@ -91,14 +92,14 @@ void takeSample(String triggerType = "unknown"){ //will likely turn sample into 
             Samples[TestSampler.sampleCounter].triggerType = triggerType;
             // others?
         } //if this sample is full, skip and increment
+
+        //publish this sample info
+        void publishSampleState();
         TestSampler.sampleCounter++; //increment counter when sample full
-    }else {// If the TestSampler.sampleCounter >= TestSampler.numSamples, a TestSampler.samplesFull bool is true, and a notice is sent to the cloud along with the sample info. 
+    }else {// If the TestSampler.sampleCounter >= TestSampler.numSamples, a notice is sent to the cloud along with the sample info. 
         // No sample containers available
         // Set flag, notify user
-        TestSampler.samplesFull = true;
-        
-        // SOMEONE ELSE PUBLISH DESIRED INFO TO CLOUD
-        
+        TestSampler.samplesFull = true;       
     }
     
 
@@ -106,25 +107,13 @@ void takeSample(String triggerType = "unknown"){ //will likely turn sample into 
     flow = 0;
     servoFlush(); //might not reset
 
-    //PUBLISH DESIRED INFO
+    //publish status
+    void publishSamplerState();
 
     // sleep after publishing everything necessary
     SystemSleepResult result = System.sleep(config); //device to sleep 
     //return; //do I need return here?
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

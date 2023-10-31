@@ -38,8 +38,9 @@ volatile float rainAmount;
 
 // object instantiations
 class Samplebottle;
+//set up sample array for 24 samples
 SampleBottle Samples[24];
-//set up sample array
+
 
 SystemSleepConfiguration config; // declare a sleep config object called config
 
@@ -62,6 +63,7 @@ class Sampler {
         float degreesPerSample = 360 / (numSamples+1); //sample bottles and flush spot split evenly
         bool samplesFull = false;
         float rainEvent; //# rain pulses?
+        //need sample interval variable
 
         //constructor
         Sampler(String site, String device, int Volume = 500, int numberOfSamples = 24, float rain = 2){
@@ -117,3 +119,7 @@ void servoSample(int sample, float degrees);
 
 void rainMeasure_ISR();
 void calculateRainfall();
+
+void publishSamplerState();
+void publishSampleState();
+     

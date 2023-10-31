@@ -69,6 +69,7 @@ void rainMeasure_ISR(){
         takeSample("Rain Event Sample");
         rainPulseCounter = 0; //reset rain pulse counter
     }
+    SystemSleepResult result = System.sleep(config); //sleep after incrementing or call calculate first?
 }
 /**
  * calculates rain fall amount in inches based on defined conversion and rain sensor pulses
@@ -77,3 +78,46 @@ void calculateRainfall(){
     rainAmount = rainPulseCounter/pulsesPerInchRain; // flow in liters
     return;
 }
+
+
+/**
+ * Beginnings of JSON digesting
+*/
+
+// void JSONHandler(){
+//     // something to receive
+
+//     if()
+// }
+
+/**
+ * publish status variables and others about the sampler machine
+ * 
+ * need to include rain event needs
+*/
+void publishSamplerState(){
+    if (Particle.connected()){
+            Particle.publish("testEvent", String::format("{\"deviceName\":\"%s\",\"siteName\":\"%s\",\"sampleVolume\":%f,\"numSamples\":%d,\"samplesFull\":%d,\"sampleCounter\":%d,\"bottleStatus\":[%d, %d, %d, %d, %d, %d, %d, %d ,%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ,%d, %d, %d, %d]}", 
+                TestSampler.deviceName, TestSampler.siteName, TestSampler.sampleVolume, TestSampler.numSamples, TestSampler.samplesFull, TestSampler.sampleCounter,Samples[0].sampleFull,Samples[1].sampleFull,Samples[2].sampleFull,Samples[3].sampleFull,Samples[4].sampleFull,Samples[5].sampleFull,
+                Samples[6].sampleFull,Samples[7].sampleFull,Samples[8].sampleFull,Samples[9].sampleFull,Samples[10].sampleFull,Samples[11].sampleFull,Samples[12].sampleFull,Samples[13].sampleFull,Samples[14].sampleFull,Samples[15].sampleFull,Samples[16].sampleFull,Samples[17].sampleFull,
+                Samples[18].sampleFull,Samples[19].sampleFull,Samples[20].sampleFull,Samples[21].sampleFull,Samples[22].sampleFull,Samples[23].sampleFull));
+    }
+}
+
+
+/**
+ * publish status of current sample
+ * 
+ * used after taking a sample
+ * 
+ * need to add sampleTime
+*/
+void publishSampleState(){
+    if (Particle.connected()){
+            Particle.publish("testEvent", String::format("{\"deviceName\":\"%s\",\"siteName\":\"%s\",\"id\":%d,\"sampleFull\":%d,\"sampleFailed\":%d,\"volumeOfSample\":%f,\"triggerType\":\"%s\"}", 
+                TestSampler.deviceName, TestSampler.siteName, Samples[TestSampler.sampleCounter].id,Samples[TestSampler.sampleCounter].sampleFull, 
+                Samples[TestSampler.sampleCounter].sampleFailed, Samples[TestSampler.sampleCounter].volumeOfSample), Samples[TestSampler.sampleCounter].triggerType);
+
+    }
+}
+
