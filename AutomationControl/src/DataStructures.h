@@ -13,6 +13,7 @@
 #include <Particle.h>
 #include <string> //ISSUES
 #include <array>
+#include "../lib/JsonParserGeneratorRK/src/JsonParserGeneratorRK.h"
 
 // Pins
 #define flowMeter D0//TEMPORARY RANDOM PINS TO BE REPLACED
@@ -38,6 +39,7 @@ volatile float rainAmount;
 
 // object instantiations
 class Samplebottle;
+JsonParserStatic<256, 10> jsonParser;
 //set up sample array for 24 samples
 SampleBottle Samples[24];
 
@@ -92,7 +94,7 @@ class SampleBottle {
         bool sampleFull = false;
         bool sampleFailed = false;
         //perhaps sample failed message
-        String triggerType; // (scheduled, commanded, Rain Event Sample)
+        String triggerType; // (scheduled, "Manual Sample", Rain Event Sample)
         float volumeOfSample = 0;
         //sampleTime // data type tbd based on type used
 
@@ -122,4 +124,8 @@ void calculateRainfall();
 
 void publishSamplerState();
 void publishSampleState();
+
+// cloud functions
+int takeSampleNow(String sampleNow);
+int setSampleConfig(String configuration);
      

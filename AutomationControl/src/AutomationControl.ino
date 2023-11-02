@@ -41,7 +41,12 @@ void setup() {
 		  .gpio(RainSensor, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
 		  .duration(sleepTime*1000);                    // or wakeup after duration in ms (unlike classic sleep fn)
     //    .duration(2min);       // alternative way to specify duration in minutes
+
+    // cloud functions
+    Particle.function("Take Sample Now", takeSampleNow);
+    Particle.function("Set Sampler Configuration", setSampleConfig);
 }
+
 
 
 

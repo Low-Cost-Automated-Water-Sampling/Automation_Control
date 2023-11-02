@@ -10,6 +10,7 @@
 
 #include "DataStructures.h"
 
+
 /**
  * Joseph DeMarco
  * 
@@ -120,4 +121,61 @@ void publishSampleState(){
 
     }
 }
+
+
+/**
+ * takeSampleNow cloud function
+*/
+int takeSampleNow(String sampleNowIn) {
+    String sampleNow = "false";
+    //{command:"bool"}
+
+    jsonParser.clear();                 // clear the parser buffer
+    jsonParser.addString(sampleNowIn);  // copy the received json cmmand data into the parser buffer // command = cmd
+ 
+    // split up json data internally
+    if(jsonParser.parse()) {
+        // traverse simple json command structure
+        sampleNow = jsonParser.getReference().key("command").valueString();
+    }
+    
+    if(sampleNow == "true") {
+        takeSample("Manual Sample"); 
+        sampleNow = "false";
+        return 1;
+    }
+    else if(sampleNow == "false") {
+        return 0;
+    }
+    else { //DO WE HAVE ERRORS OR SHOULD IT NOT MATTER BC IT IS BACKEND WORK?
+        return -1;
+    }
+}
+
+int setSampleConfig(String configuration) {
+    String sampleNow = "false";
+    //{command:"bool"}
+
+    jsonParser.clear();                 // clear the parser buffer
+    jsonParser.addString(configuration);  // copy the received json cmmand data into the parser buffer // command = cmd
+ 
+    // split up json data internally
+    if(jsonParser.parse()) {
+        // traverse simple json command structure
+        sampleNow = jsonParser.getReference().key("command").valueString();
+    }
+    
+    if(sampleNow == "true") {
+        takeSample("Manual Sample"); 
+        sampleNow = "false";
+        return 1;
+    }
+    else if(sampleNow == "false") {
+        return 0;
+    }
+    else { //DO WE HAVE ERRORS OR SHOULD IT NOT MATTER BC IT IS BACKEND WORK?
+        return -1;
+    }
+}
+
 
