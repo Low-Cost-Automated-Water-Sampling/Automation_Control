@@ -56,16 +56,18 @@ SystemSleepConfiguration config; // declare a sleep config object called config
 //CONSIDERING MAKING INTO "SAMPLER" class
 class Sampler {
     public: 
-
         String siteName; 
         String deviceName;
-        float sampleVolume; 
+
+        float sampleVolume;
+        float rainEvent; //# rain pulses?
+        float degreesPerSample = 360 / (numSamples+1); //sample bottles and flush spot split evenly
+
         int numSamples; //define number of samples available while empty
         int sampleCounter = 0; //increment
-        float degreesPerSample = 360 / (numSamples+1); //sample bottles and flush spot split evenly
+        int sampleInterval;
+
         bool samplesFull = false;
-        float rainEvent; //# rain pulses?
-        //need sample interval variable
 
         //constructor
         Sampler(String site, String device, int Volume = 500, int numberOfSamples = 24, float rain = 2){

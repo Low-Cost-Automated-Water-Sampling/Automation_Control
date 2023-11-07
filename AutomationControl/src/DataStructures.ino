@@ -158,15 +158,32 @@ int takeSampleNow(String sampleNowIn) {
 
 int setSampleConfig(String configuration) {
     String sampleNow = "false";
-    //{command:"bool"}
+    /* 
+        {
+            "command": "setSamplingConfiguration",
+            "deviceName": "ExampleWaterSamplerName",
+            "siteName": "VillanovaExampleLake",
+            "startTime": "2023-11-01T09:00:00Z",
+            "sampleInterval": "3600",
+            "numSamples": 4,
+            "sampleVolume": 250
+        }
+    */
 
-    jsonParser.clear();                 // clear the parser buffer
-    jsonParser.addString(configuration);  // copy the received json cmmand data into the parser buffer // command = cmd
+    jsonParser.clear();                   // clear the parser buffer
+    jsonParser.addString(configuration);  // copy the received json command data into the parser buffer // command = cmd
  
     // split up json data internally
     if(jsonParser.parse()) {
         // traverse simple json command structure
         sampleNow = jsonParser.getReference().key("command").valueString();
+        deviceName = jsonParser.getReference().key("deviceName").valueString();
+        siteName = jsonParser.getReference().key("siteName").valueString();
+        //startTime = jsonParser.getReference().key("startTime").valueString();
+
+        sampleInterval = jsonParser.getReference().key("sampleInterval").valueInt();
+        numSamples = jsonParser.getReference().key("numSamples").valueInt();
+        sampleVolume = jsonParser.getReference().key("sampleVolume").valueFloat();
     }
     
     if(sampleNow == "true") {
