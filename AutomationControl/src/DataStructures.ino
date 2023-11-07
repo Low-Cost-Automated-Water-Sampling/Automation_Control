@@ -125,6 +125,8 @@ void publishSampleState(){
 
 /**
  * takeSampleNow cloud function
+ * 
+ * Joseph DeMarco
 */
 int takeSampleNow(String sampleNowIn) {
     String sampleNow = "false";
@@ -151,6 +153,8 @@ int takeSampleNow(String sampleNowIn) {
         return -1;
     }
 }
+
+
 
 int setSampleConfig(String configuration) {
     String sampleNow = "false";
