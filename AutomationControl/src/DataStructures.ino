@@ -166,7 +166,9 @@ int setSampleConfig(String configuration) {
             "startTime": "2023-11-01T09:00:00Z",
             "sampleInterval": "3600",
             "numSamples": 4,
-            "sampleVolume": 250
+            "sampleVolume": 250,
+            "degreesPerSample": 360/(numSamples+1)// to change based on sample management solution 
+            "rainEvent": 2.5;  //# inches of rain before automatic sample 
         }
     */
 
@@ -184,6 +186,9 @@ int setSampleConfig(String configuration) {
         sampleInterval = jsonParser.getReference().key("sampleInterval").valueInt();
         numSamples = jsonParser.getReference().key("numSamples").valueInt();
         sampleVolume = jsonParser.getReference().key("sampleVolume").valueFloat();
+
+        degreesPerSample = jsonParser.getReference().key("degreesPerSample").valueFloat();
+        rainEvent = jsonParser.getReference().key("rainEvent").valueFloat();
     }
     
     if(sampleNow == "true") {
