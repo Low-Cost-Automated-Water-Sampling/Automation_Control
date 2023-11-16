@@ -170,7 +170,9 @@ int setSampleConfig(String configuration) {
             "startTime": "2023-11-01T09:00:00Z", 
             "sampleInterval": "3600",
             "numSamples": 4,
-            "sampleVolume": 250
+            "sampleVolume": 250,
+            "degreesPerSample": 360/(numSamples+1)// to change based on sample management solution 
+            "rainEvent": 2.5;  //# inches of rain before automatic sample 
         }
     */
 
