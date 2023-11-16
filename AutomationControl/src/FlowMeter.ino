@@ -15,12 +15,9 @@
 
 void flowMeter_ISR(){
     flowPulseCount++;
-    if(flow >= (TestSampler.sampleVolume-50)){ //50 mL threshold
-        pumpOff();
-    }
 }
 
 // Function to read the sensor output and calculate the flow
 void calcWaterFlow() {
-    flow = flowPulseCount/pulsesPerLiter; // flow in liters
+    flow = flowPulseCount/pulsesPermL; // flow in liters
 }

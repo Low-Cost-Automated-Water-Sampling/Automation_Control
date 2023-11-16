@@ -12,8 +12,7 @@
 
 
 void RunPump(){
-	digitalWrite(pump, HIGH);
-  
+	digitalWrite(pump, HIGH);	
 }
 
 //Joe 10/15

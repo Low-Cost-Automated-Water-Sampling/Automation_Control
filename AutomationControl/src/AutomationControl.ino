@@ -4,7 +4,7 @@
  * Author: Joseph DeMarco
  * Date: 10/15/2023
  * 
- * Updated: 11/2
+ * Updated: 11/11
  */
 
 #include <Particle.h>
@@ -18,16 +18,16 @@ SYSTEM_THREAD(ENABLED);
 
 
 void setup() {
-    // Put initialization like pinMode and begin functions here.
-    // Set the sensor pin as an input
+    // pin setup
     pinMode(pump, OUTPUT);
     pinMode(servo, OUTPUT);
-    pinMode(flowMeter, INPUT); //will need to change to PULLUP or PULLDOWN unsure
-    attachInterrupt(flowMeter, flowMeter_ISR, RISING);
-    attachInterrupt(RainSensor, rainMeasure_ISR, FALLING); //Not positive this is how this will work
+    pinMode(flowMeter, INPUT_PULLUP); //will need to change to PULLUP or PULLDOWN unsure
+    // pinMode(led1, OUTPUT); //LEDs to show sleeping or awake
+    // pinMode(LED0, OUTPUT);
 
-    pinMode(led1, OUTPUT); //LEDs to show sleeping or awake
-    pinMode(LED0, OUTPUT);
+    //interrupt set up
+    attachInterrupt(flowMeter, flowMeter_ISR, FALLING);
+    //attachInterrupt(RainSensor, rainMeasure_ISR, FALLING); //Not positive this is how this will work
 
     //bottle array instantiation
     for(int i=0; i<24; i++){
@@ -35,11 +35,11 @@ void setup() {
     }
 
     //Sleep configuration
-    config.mode(SystemSleepMode::ULTRA_LOW_POWER)       // define the properties of our sleep config object
-          //.network(NETWORK_INTERFACE_CELLULAR)        // should wakeup due to network or cellular connection
-          //.flag(SystemSleepFlag::WAIT_CLOUD)
-		  .gpio(RainSensor, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
-		  .duration(sleepTime*1000);                    // or wakeup after duration in ms (unlike classic sleep fn)
+    // config.mode(SystemSleepMode::ULTRA_LOW_POWER)       // define the properties of our sleep config object
+    //       //.network(NETWORK_INTERFACE_CELLULAR)        // should wakeup due to network or cellular connection
+    //       //.flag(SystemSleepFlag::WAIT_CLOUD)
+	// 	  .gpio(RainSensor, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
+	// 	  .duration(sleepTime*1000);                    // or wakeup after duration in ms (unlike classic sleep fn)
     //    .duration(2min);       // alternative way to specify duration in minutes
 
     // cloud functions
@@ -51,50 +51,61 @@ void setup() {
 
 
 void loop() {
-    calcWaterFlow();
-    calculateRainfall();
 
-    //Including Sleep control and rain meter
-    
-                           		  
-    // digitalWrite(LED0,LOW);                             // turn off led before going to sleep
-	// SystemSleepResult result = System.sleep(config);    // go to sleep
-    // digitalWrite(LED0, HIGH);                           // turn on the led when we wake up
-    // delay(10000);       
+    // take sample if flag calls
+    if(immSampleFlag == true){
+        takeSample("Manual Sample"); 
+    }
+    if(periodicSampleFlag == true){
+        takeSample("Periodic Sample");
+    }
+        
 
 }
 
-/**
- * This is slightly sample data structure ignorant. It might be better to make these class functions instead of a regular function
- * perhaps the sample objects could be in an array indexed by a sample counter to know which is next
- * 
- * NEED CLOUD PUBLISHINGS FOR DIFFERENT FLAGS AND SAMPLE INFORMATION
-*/
 
+/**
+ * Main sample functionality function
+ * 
+ * flush, sample, publish
+*/
 // Sample Process
 // Default sample arm position will be flush, at the end of a sample cycle
-// On Scheduled sample time, user input, or specified rain event
-// TIMER?
-void takeSample(String triggerType = "unknown"){ //will likely turn sample into an interrupt or something similar
+// On Scheduled sample time, user input, or //specified rain event
+void takeSample(String triggerType = "unknown"){ 
     // First check sample availability/count
     if(TestSampler.sampleCounter < TestSampler.numSamples){ // Samples available 
         if(Samples[TestSampler.sampleCounter].sampleFull == false){ // and this sample is empty
             flushSystem(); // Flush System //tbd 
+            if(Samples[TestSampler.sampleCounter].sampleFailed == false){ //if flush successful
+                // fillSample
+                servoSample(TestSampler.sampleCounter, TestSampler.degreesPerSample); // Position servo to next available sample
+                RunPump();
+                int sampleStart = Time.now();
 
-            // fillSample
-            // maybe change to Samples[sampleCounter].fill or something with degree values internal
-            // servo control TO BE DEFINED - will adjust arg needs
-            servoSample(TestSampler.sampleCounter, TestSampler.degreesPerSample); // Position servo to next available sample
-            RunPump(); // Flow meter ISR calls pumpOff if flow == sampleVolume
-            // might be better to put pump control conditions
-
-            //check water is flowing
-            pumpingFails();
-
+                //// While loop with condition on flow and timeout
+                while(flow < (TestSampler.sampleVolume-50) && (Time.now()-sampleStart < 50)){
+                    calcWaterFlow();
+                }
+                pumpOff();
+                
+                //sample failure: if flow doesn't reach sample volume
+                if(flow<TestSampler.sampleVolume-50){
+                    // set fail message and flag
+                    Samples[TestSampler.sampleCounter].statusMessage = "Sample failed: insufficient flow";
+                    Samples[TestSampler.sampleCounter].sampleFailed = true;
+                    Samples[TestSampler.sampleCounter].sampleFull = false;
+                } else {
+                    Samples[TestSampler.sampleCounter].statusMessage = "Sample successful";
+                    Samples[TestSampler.sampleCounter].sampleFailed = false;
+                    Samples[TestSampler.sampleCounter].sampleFull = true;
+                }
+            }
             // update necessary sample bottle statuses
-            Samples[TestSampler.sampleCounter].sampleFull;
             // Samples[TestSampler.sampleCounter].sampleTime //sampleTime tbd
             Samples[TestSampler.sampleCounter].triggerType = triggerType;
+            Samples[TestSampler.sampleCounter].volumeOfSample = flow;
+            
             // others?
         } //if this sample is full, skip and increment
 
@@ -103,21 +114,22 @@ void takeSample(String triggerType = "unknown"){ //will likely turn sample into 
         TestSampler.sampleCounter++; //increment counter when sample full
     }else {// If the TestSampler.sampleCounter >= TestSampler.numSamples, a notice is sent to the cloud along with the sample info. 
         // No sample containers available
-        // Set flag, notify user
-        TestSampler.samplesFull = true;       
+        // Set flag
+        TestSampler.samplesFull = true;      
+    }
+    
+    // reset flow counter and publish sampler state
+    flowPulseCount = 0;
+    publishSamplerState();
+
+    ////////////// Reset Sample Triggers ////////////////////
+    if(triggerType == "Manual Sample"){
+        immSampleFlag = false;
     }
     
 
-    // Reset flow and servo to flush position
-    flow = 0;
-    servoFlush(); //might not reset
-
-    //publish status
-    void publishSamplerState();
-
     // sleep after publishing everything necessary
-    SystemSleepResult result = System.sleep(config); //device to sleep 
-    //return; //do I need return here?
+    // SystemSleepResult result = System.sleep(config); //device to sleep 
 }
 
 

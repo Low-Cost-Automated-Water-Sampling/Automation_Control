@@ -16,7 +16,7 @@
 #include "../lib/JsonParserGeneratorRK/src/JsonParserGeneratorRK.h"
 
 // Pins
-#define flowMeter D0//TEMPORARY RANDOM PINS TO BE REPLACED
+#define flowMeter A2//TEMPORARY RANDOM PINS TO BE REPLACED
 #define servo D1
 #define pump D2 
 #define RainSensor D3
@@ -24,27 +24,37 @@
 #define led1 D5
 
 //constants
-#define sleepTime 120        // sleep time in sec = 2 min
+//#define sleepTime 120        // sleep time in sec = 2 min
 
 
 ////////////////////////////////// Variables ///////////////////////////////////////////////////
-const float pulsesPerLiter = 450; //output pulses/liters
-const float pulsesPerInchRain = 2; //random definition, 2 pulses for 1 inch of rain
+volatile bool immSampleFlag = false;
+volatile bool periodicSampleFlag = false;
 
-//Global variables
-volatile int flowPulseCount;
-volatile int rainPulseCounter;
+
+
+////// Global variables
+// flow meter
+const float pulsesPermL = .45; //pulses per mL //450; //output pulses/liters
+volatile int flowPulseCount = 0;
 volatile float flow;
-volatile float rainAmount;
+
+// rain sensor
+// const float pulsesPerInchRain = 2; //random definition, 2 pulses for 1 inch of rain
+// volatile int rainPulseCounter;
+// volatile float rainAmount;
 
 // object instantiations
 class Samplebottle;
+class Sampler;
+//Get user input somehow???? Is this in Setup or here?
+Sampler TestSampler = Sampler();
 JsonParserStatic<256, 10> jsonParser;
 //set up sample array for 24 samples
 SampleBottle Samples[24];
 
 
-SystemSleepConfiguration config; // declare a sleep config object called config
+//SystemSleepConfiguration config; // declare a sleep config object called config
 
 
 ///////////////////////////////// Classes //////////////////////////////////////////////
@@ -53,34 +63,32 @@ SystemSleepConfiguration config; // declare a sleep config object called config
  * Sampler object info class
 */
 //will be user input defined
-//CONSIDERING MAKING INTO "SAMPLER" class
 class Sampler {
     public: 
         String siteName; 
         String deviceName;
 
         float sampleVolume;
-        float rainEvent; //# rain pulses?
+        //float rainEvent; //# rain pulses?
         float degreesPerSample = 360 / (numSamples+1); //sample bottles and flush spot split evenly
 
         int numSamples; //define number of samples available while empty
         int sampleCounter = 0; //increment
-        int sampleInterval;
 
         bool samplesFull = false;
+        int sampleInterval; // tbd sample period
 
         //constructor
-        Sampler(String site, String device, int Volume = 500, int numberOfSamples = 24, float rain = 2){
+        Sampler(String site = "CEER 005", String device = "Demo Sampler", int Volume = 500, int numberOfSamples = 24, float rain = 2){
             siteName = site;
             deviceName = device;
             sampleVolume = Volume;
             numSamples = numberOfSamples;
-            rainAmount = rain;
+            //rainAmount = rain;
         };
 };
 
-//Get user input somehow???? Is this in Setup or here?
-Sampler TestSampler("CEER 005", "Sampler1");
+
 
 
 /**
@@ -89,15 +97,16 @@ Sampler TestSampler("CEER 005", "Sampler1");
 // class SampleBottle; // declaration to potentially be used to export definition
 class SampleBottle {
     public: 
-
         // adjust based on cloud publishing needs. Needs to be string???
         int id;
-        //can be string status (Available, Pending, Full) 
+
         bool sampleFull = false;
-        bool sampleFailed = false;
-        //perhaps sample failed message
         String triggerType; // (scheduled, "Manual Sample", Rain Event Sample)
         float volumeOfSample = 0;
+
+        String statusMessage;
+        bool sampleFailed = false;
+
         //sampleTime // data type tbd based on type used
 
         //Constructor
