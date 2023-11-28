@@ -21,13 +21,15 @@ void setup() {
     // pin setup
     pinMode(pump, OUTPUT);
     pinMode(servo, OUTPUT);
-    pinMode(flowMeter, INPUT_PULLUP); //will need to change to PULLUP or PULLDOWN unsure
+    pinMode(flowMeter, INPUT_PULLUP); //will need to change to PULLUP or PULLDOWN unsurepinMode(flowMeter, INPUT_PULLUP); //will need to change to PULLUP or PULLDOWN unsure
+    pinMode(rainSensor, INPUT_PULLDOWN); //will need to change to PULLDOWN (will need confirmation)
     // pinMode(led1, OUTPUT); //LEDs to show sleeping or awake
     // pinMode(LED0, OUTPUT);
 
     //interrupt set up
     attachInterrupt(flowMeter, flowMeter_ISR, FALLING);
-    //attachInterrupt(RainSensor, rainMeasure_ISR, FALLING); //Not positive this is how this will work
+    // setup for pin based intervention
+    attachInterrupt(rainSensor, rainMeasure_ISR, FALLING); // need to validate how this will work
 
     //bottle array instantiation
     for(int i=0; i<24; i++){
@@ -38,7 +40,7 @@ void setup() {
     // config.mode(SystemSleepMode::ULTRA_LOW_POWER)       // define the properties of our sleep config object
     //       //.network(NETWORK_INTERFACE_CELLULAR)        // should wakeup due to network or cellular connection
     //       //.flag(SystemSleepFlag::WAIT_CLOUD)
-	// 	  .gpio(RainSensor, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
+	// 	  .gpio(rainSensor, FALLING)                    // specify wakeup if falling edge on WAKEUP_PIN
 	// 	  .duration(sleepTime*1000);                    // or wakeup after duration in ms (unlike classic sleep fn)
     //    .duration(2min);       // alternative way to specify duration in minutes
 
@@ -46,8 +48,6 @@ void setup() {
     Particle.function("Take Sample Now", takeSampleNow);
     Particle.function("Set Sampler Configuration", setSampleConfig);
 }
-
-
 
 
 void loop() {
@@ -59,8 +59,6 @@ void loop() {
     if(periodicSampleFlag == true){
         takeSample("Periodic Sample");
     }
-        
-
 }
 
 
