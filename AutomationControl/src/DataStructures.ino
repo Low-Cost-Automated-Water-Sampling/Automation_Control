@@ -70,22 +70,27 @@ void servoSample(int sample, float degrees){
 // }
 
 
-// // need to flesh out 
-// void rainMeasure_ISR(){
-//     rainPulseCounter++;
-//     if(rainAmount >= TestSampler.rainEvent){ //50 mL threshold
-//         takeSample("Rain Event Sample");
-//         rainPulseCounter = 0; //reset rain pulse counter
-//     }
-//     SystemSleepResult result = System.sleep(config); //sleep after incrementing or call calculate first?
-// }
-// /**
-//  * calculates rain fall amount in inches based on defined conversion and rain sensor pulses
-// */
-// void calculateRainfall(){
-//     rainAmount = rainPulseCounter/pulsesPerInchRain; // flow in liters
-//     return;
-// }
+void rainMeasure_ISR(){
+	int timespan = 6 * 3600; //hours * seconds
+	if ((time.now() - lastrainevent) >= timespan) {
+		rainPulseCounter++;
+		if(rainAmount >= TestSampler.rainEvent) { // 50 mL threshold
+			takeSample("Rain Event Sample"); // is there a way to call this asycronously (ex. PublishQueuePosixRK lib)
+			rainPulseCounter = 0; // reset rain pulse counter
+			lastrainevent = time.now(); // resync time for next round
+		}
+	}
+
+    // SystemSleepResult result = System.sleep(config); //sleep after incrementing or call calculate first?
+}
+
+/**
+ * calculates rain fall amount in inches based on defined conversion and rain sensor pulses
+*/
+void calculateRainfall() {
+    rainAmount = rainPulseCounter/pulsesPerInchRain; // flow in liters
+    return;
+}
 
 
 

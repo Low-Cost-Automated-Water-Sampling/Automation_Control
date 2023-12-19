@@ -21,11 +21,13 @@ void setup() {
     // pin setup
     pinMode(pump, OUTPUT);
     pinMode(servo, OUTPUT);
-    pinMode(flowMeter, INPUT_PULLUP);
+    pinMode(flowMeter, INPUT_PULLUP); //will need to change to PULLUP or PULLDOWN unsurepinMode(flowMeter, INPUT_PULLUP); //will need to change to PULLUP or PULLDOWN unsure
+    pinMode(rainSensor, INPUT_PULLDOWN); //will need to change to PULLDOWN (will need confirmation)
 
     //interrupt set up
     attachInterrupt(flowMeter, flowMeter_ISR, FALLING);
-    //attachInterrupt(RainSensor, rainMeasure_ISR, FALLING); //Not positive this is how this will work
+    // setup for pin based intervention
+    attachInterrupt(rainSensor, rainMeasure_ISR, FALLING); // need to validate how this will work
 
     //bottle array instantiation
     for(int i=0; i<24; i++){
@@ -37,6 +39,7 @@ void setup() {
     Particle.function("Take Sample Now", takeSampleNow);
     Particle.function("Set Sampler Configuration", setSampleConfig);
 }
+
 
 void loop() {
 
