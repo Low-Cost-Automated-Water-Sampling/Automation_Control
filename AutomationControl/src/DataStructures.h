@@ -45,13 +45,12 @@ volatile float flow;
 // volatile float rainAmount;
 
 // object instantiations
-class Samplebottle;
-class Sampler;
-//Get user input somehow???? Is this in Setup or here?
-Sampler TestSampler = Sampler();
+//class SampleBottle;
+//class Sampler;
+
 JsonParserStatic<256, 10> jsonParser;
 //set up sample array for 24 samples
-SampleBottle Samples[24];
+
 
 
 //SystemSleepConfiguration config; // declare a sleep config object called config
@@ -89,6 +88,7 @@ class Sampler {
 };
 
 
+Sampler TestSampler; // = Sampler();
 
 
 /**
@@ -97,8 +97,6 @@ class Sampler {
 // class SampleBottle; // declaration to potentially be used to export definition
 class SampleBottle {
     public: 
-        // adjust based on cloud publishing needs. Needs to be string???
-        int id;
 
         bool sampleFull = false;
         String triggerType; // (scheduled, "Manual Sample", Rain Event Sample)
@@ -107,14 +105,11 @@ class SampleBottle {
         String statusMessage;
         bool sampleFailed = false;
 
-        //sampleTime // data type tbd based on type used
-
-        //Constructor
-        SampleBottle(int idInitializer){
-            id = idInitializer;
-        }
+        String sampleTime; // data type tbd based on type used
 
 };
+
+SampleBottle Samples[24];
 
 ///////////////////////////////////////////////// Functions /////////////////////////////////////////////
 // function declarations

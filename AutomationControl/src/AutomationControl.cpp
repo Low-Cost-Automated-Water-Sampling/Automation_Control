@@ -1,3 +1,8 @@
+/******************************************************/
+//       THIS IS A GENERATED FILE - DO NOT EDIT       //
+/******************************************************/
+
+#line 1 "c:/Users/joejo/OneDrive/Desktop/Automation_Control/AutomationControl/src/AutomationControl.ino"
 /*
  * Project AutomationControl
  * Description: MAIN for Sampler Control
@@ -13,6 +18,9 @@
 // #include "FlowMeter.ino"
 // #include "PumpFunction.ino"
 
+void setup();
+void loop();
+#line 16 "c:/Users/joejo/OneDrive/Desktop/Automation_Control/AutomationControl/src/AutomationControl.ino"
 SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED); 
 
@@ -29,7 +37,7 @@ void setup() {
 
     //bottle array instantiation
     for(int i=0; i<24; i++){
-        Samples[i] = SampleBottle(); 
+        Samples[i] = SampleBottle(); // ID = 0->23 +1-> 1->24
     }
     // Sampler TestSampler; // = Sampler();
 

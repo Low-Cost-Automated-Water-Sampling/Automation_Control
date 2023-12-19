@@ -1,3 +1,9 @@
+/******************************************************/
+//       THIS IS A GENERATED FILE - DO NOT EDIT       //
+/******************************************************/
+
+#include "Particle.h"
+#line 1 "c:/Users/joejo/OneDrive/Desktop/Automation_Control/AutomationControl/src/DataStructures.ino"
 /**
  * Joseph DeMarco
  * 
@@ -17,6 +23,14 @@
  * 
  * Flush system function: move to flush servo, run pump
 */
+void flushSystem();
+void servoFlush();
+void servoSample(int sample, float degrees);
+void publishSamplerState();
+void publishSampleState();
+int takeSampleNow(String sampleNowIn);
+int setSampleConfig(String configuration);
+#line 20 "c:/Users/joejo/OneDrive/Desktop/Automation_Control/AutomationControl/src/DataStructures.ino"
 void flushSystem() {
 	servoFlush(); // ServoFlush: Set servo motor to flush position
 
